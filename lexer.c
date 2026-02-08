@@ -427,5 +427,10 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             continue;
         }
 
+        // NEWLINE: ';' or '\n'
+        if (cp == (uint32_t)';' || cp == (uint32_t)'\n') {
+            return make_simple_token(lx, out_tok, TOK_NEWLINE);
+        }
+
     }
 }
