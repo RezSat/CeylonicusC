@@ -400,5 +400,15 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
     for (;;) {
         uint32_t cp = 0;
         LexerStatus st = peek_cp(lx, &cp);
+
+        if (st == LEX_EOF) {
+            // Emit EOF token
+            token_init(out_tok, TOK_EOF, &lx->pos, &lx->pos);
+            return LEX_EOF;
+        }
+        if (st != LEX_OK) {
+            set_error(lx, &lx->pos, &lx->pos, 0, 0);
+            return st;
+        }
     }
 }
