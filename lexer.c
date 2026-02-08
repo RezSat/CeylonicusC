@@ -26,3 +26,7 @@ static int is_ident_char(uint32_t cp) {
     if (cp == (uint32_t)'_') return 1;
     return 0;
 }
+
+static void set_pos(Position* dst, const Position* src) {
+    *dst = *src;
+}
