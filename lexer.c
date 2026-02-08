@@ -121,3 +121,13 @@ static void token_init(Token* t, TokenType type, const Position* start, const Po
     t->start = *start;
     t->end = *end;
 }
+
+static LexerStatus make_simple_token(Lexer* lx, Token* out, TokenType type) {
+    Position start = lx->pos;
+    uint32_t cp = 0;
+    LexerStatus st = advance_cp(lx, &cp);
+    if (st != LEX_OK) return st;
+    Position end = lx->pos;
+    token_init(out, type, &start, &end);
+    return LEX_OK;
+}
