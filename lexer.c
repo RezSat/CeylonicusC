@@ -150,3 +150,64 @@ static LexerStatus skip_comment(Lexer* lx) {
         if (st != LEX_OK && st != LEX_EOF) return st;
     }
 }
+
+static LexerStatus lex_number(Lexer* lx, Token* out) {
+    Position start = lx->pos;
+    size_t start_byte = lx->i;
+
+    int dot_count = 0;
+
+    for (;;) {
+        uint32_t cp = 0;
+        LexerStatus st = peek_cp(lx, &cp);
+        if (st != LEX_OK) break;
+
+        if (cp == (uint32_t)'.') {
+            if (dot_count == 1) break;
+            dot_count++;
+            uint32_t consumed = 0;
+            st = advance_cp(lx, &consumed);
+            if (st != LEX_OK) return st;
+            continue;
+        }
+
+        if (!is_ascii_digit(cp)) break;
+
+        uint32_t consumed = 0;
+        st = advance_cp(lx, &consumed);
+        if (st != LEX_OK) return st;
+    }
+
+    size_t end_byte = lx->i;
+    size_t n = end_byte - start_byte;
+
+    // Reject lone "." (otherwise strtod would accept it weirdly / fail)
+    if (n == 1 && lx->src[start_byte] == (uint8_t)'.') {
+        Position end = lx->pos;
+        set_error(lx, &start, &end, (uint32_t)'.', 0);
+        return LEX_ILLEGAL_CHAR;
+    }
+
+    char* tmp = (char*)malloc(n + 1);
+    if (!tmp) {
+        // treat as illegal for now (you can add OUT_OF_MEMORY later)
+        Position end = lx->pos;
+        set_error(lx, &start, &end, 0, 0);
+        return LEX_ILLEGAL_CHAR;
+    }
+    memcpy(tmp, (const char*)lx->src + start_byte, n);
+    tmp[n] = '\0';
+
+    Position end = lx->pos;
+
+    if (dot_count == 0) {
+        token_init(out, TOK_INT, &start, &end);
+        out->value.i = strtoll(tmp, NULL, 10);
+    } else {
+        token_init(out, TOK_FLOAT, &start, &end);
+        out->value.f = strtod(tmp, NULL);
+    }
+
+    free(tmp);
+    return LEX_OK;
+}
