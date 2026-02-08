@@ -432,5 +432,28 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             return make_simple_token(lx, out_tok, TOK_NEWLINE);
         }
 
+        // Number: digit OR '.' followed by digit
+        if (is_ascii_digit(cp) || cp == (uint32_t)'.') {
+            if (cp == (uint32_t)'.') {
+                // lookahead: '.' must be followed by digit to start a number
+                size_t tmp_i = lx->i;
+                uint32_t c0 = 0;
+                Utf8Status us0 = utf8_next(lx->src, lx->len, &tmp_i, &c0);
+                (void)us0;
+                uint32_t c1 = 0;
+                Utf8Status us1 = utf8_next(lx->src, lx->len, &tmp_i, &c1);
+                if (us1 != UTF8_OK || !is_ascii_digit(c1)) {
+                    Position start = lx->pos;
+                    // consume '.' so we don't get stuck
+                    uint32_t consumed = 0;
+                    advance_cp(lx, &consumed);
+                    Position end = lx->pos;
+                    set_error(lx, &start, &end, (uint32_t)'.', 0);
+                    return LEX_ILLEGAL_CHAR;
+                }
+            }
+            return lex_number(lx, out_tok);
+        }
+
     }
 }
