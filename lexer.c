@@ -455,5 +455,10 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             return lex_number(lx, out_tok);
         }
 
+        // Identifier / Keyword
+        if (is_ident_char(cp)) {
+            return lex_identifier_or_keyword(lx, out_tok);
+        }
+
     }
 }
