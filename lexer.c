@@ -190,7 +190,7 @@ static LexerStatus lex_number(Lexer* lx, Token* out) {
 
     char* tmp = (char*)malloc(n + 1);
     if (!tmp) {
-        // treat as illegal for now (you can add OUT_OF_MEMORY later)
+        // treat as illegal for now (TODO: add OUT_OF_MEMORY later)
         Position end = lx->pos;
         set_error(lx, &start, &end, 0, 0);
         return LEX_ILLEGAL_CHAR;
