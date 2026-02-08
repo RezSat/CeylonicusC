@@ -528,6 +528,7 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             case ')': return make_simple_token(lx, out_tok, TOK_RPAREN);
             case '[': return make_simple_token(lx, out_tok, TOK_LSQUARE);
             case ']': return make_simple_token(lx, out_tok, TOK_RSQUARE);
+            case ',': return make_simple_token(lx, out_tok, TOK_COMMA);
 
   
         }
