@@ -14,5 +14,10 @@ static const char* CEY_KEYWORDS[] = {
 
 
 int lexer_default_is_keyword(StrSlice s) {
+    for (size_t k = 0; CEY_KEYWORDS[k]; k++) {
+        const char* kw = CEY_KEYWORDS[k];
+        size_t kwlen = strlen(kw);
+        if (s.len == kwlen && memcmp(s.ptr, kw, kwlen) == 0) return 1;
+    }
     return 0;
 }
