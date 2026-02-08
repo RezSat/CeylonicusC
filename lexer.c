@@ -131,3 +131,22 @@ static LexerStatus make_simple_token(Lexer* lx, Token* out, TokenType type) {
     token_init(out, type, &start, &end);
     return LEX_OK;
 }
+
+static LexerStatus skip_comment(Lexer* lx) {
+    // current is '#'
+    uint32_t cp = 0;
+    LexerStatus st = advance_cp(lx, &cp);
+    if (st != LEX_OK) return st;
+
+    for (;;) {
+        uint32_t p = 0;
+        st = peek_cp(lx, &p);
+        if (st == LEX_EOF) return LEX_OK;
+        if (st != LEX_OK) return st;
+
+        if (p == (uint32_t)'\n') return LEX_OK; // stop before newline
+        // consume
+        st = advance_cp(lx, &p);
+        if (st != LEX_OK && st != LEX_EOF) return st;
+    }
+}
