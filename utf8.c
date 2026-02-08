@@ -1,6 +1,6 @@
 #include "utf8.h"
 
-static int is_count(uint8_t b) {
+static int is_cont(uint8_t b) {
     return (b & 0xC0u) == 0x80u; // 10xxxxxx
 }
 
@@ -19,7 +19,7 @@ Utf8Status utf8_next(const uint8_t* buf, size_t len, size_t* i, uint32_t* out_cp
     }
 
     // Reject continuation byte as a start byte
-    if (is_count(b0)) return UTF8_INVALID;
+    if (is_cont(b0)) return UTF8_INVALID;
 
     // Determine sequence length (with minimal validation ranges)
 
@@ -49,7 +49,7 @@ Utf8Status utf8_next(const uint8_t* buf, size_t len, size_t* i, uint32_t* out_cp
     // Read continuation bytes
     for (size_t k = 1; k < need; k++) {
         uint8_t bx = buf[*i + k];
-        if (!is_count(bx)) return UTF8_INVALID;
+        if (!is_cont(bx)) return UTF8_INVALID;
         cp = (cp << 6) | (uint32_t)(bx & 0x3Fu);
     }
 
