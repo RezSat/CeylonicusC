@@ -46,9 +46,9 @@ typedef struct {
 } StrSlice;
 
 union TokenValue {
-    int64_t i;
-    double f;
-    StrSlice str;
+    int64_t i; // integer (short hand for TOK_INT)
+    double f; // float (short hand for TOK_FLOAT)
+    StrSlice str; // string (for TOK_KEYWORD, TOK_ID, TOK_STRING)
 }
 typedef struct {
     size_t index; //byte index
