@@ -72,3 +72,41 @@ static LexerStatus peek_cp(Lexer* lx, uint32_t* out_cp) {
     *out_cp = cp;
     return LEX_OK;
 }
+
+static LexerStatus advance_cp(Lexer* lx, uint32_t* out_cp) {
+    if (!lx || !out_cp) return LEX_INVALID_UTF8;
+
+    // If we already peeked, consume from the real stream.
+    uint32_t cp = 0;
+    size_t old_i = lx->i;
+
+    if (lx->has_current) {
+        // We must re-decode to know how many bytes to advance.
+        // (We could cache byte length too, but this is simplest and still fast.)
+        size_t tmp_i = lx->i;
+        Utf8Status us = utf8_next(lx->src, lx->len, &tmp_i, &cp);
+        LexerStatus ls = status_from_utf8(us);
+        if (ls != LEX_OK) return ls;
+
+        lx->i = tmp_i;
+        lx->has_current = 0;
+    } else {
+        Utf8Status us = utf8_next(lx->src, lx->len, &lx->i, &cp);
+        LexerStatus ls = status_from_utf8(us);
+        if (ls != LEX_OK) return ls;
+    }
+
+    // Update position: index is byte index. Column is codepoint column.
+    lx->pos.index = lx->i;
+
+    if (cp == (uint32_t)'\n') {
+        lx->pos.line += 1;
+        lx->pos.column = 0;
+    } else {
+        // If old_i == lx->i (shouldn't happen), still treat as one column step.
+        lx->pos.column += 1;
+    }
+
+    *out_cp = cp;
+    return LEX_OK;
+}
