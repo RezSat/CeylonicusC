@@ -44,4 +44,13 @@ Utf8Status utf8_next(const uint8_t* buf, size_t len, size_t* i, uint32_t* out_cp
         return UTF8_INVALID;
     }
 
+    if (*i + need > len) return UTF8_INVALID;
+
+    // Read continuation bytes
+    for (size_t k = 1; k < need; k++) {
+        uint8_t bx = buf[*i + k];
+        if (!is_count(bx)) return UTF8_INVALID;
+        cp = (cp << 6) | (uint32_t)(bx & 0x3Fu);
+
+    }
 }
