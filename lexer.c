@@ -622,7 +622,18 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
                 token_init(out_tok, TOK_GREATERTHAN, &start, &end);
                 return LEX_OK;
             }
-  
+
+            default: {
+                // Illegal char (including '`' since I am not going to implementing python blocks)
+                Position start = lx->pos;
+                uint32_t bad = 0;
+                st = advance_cp(lx, &bad); // consume to avoid infinite loop
+                if (st != LEX_OK) return st;
+                Position end = lx->pos;
+                set_error(lx, &start, &end, bad, 0);
+                return LEX_ILLEGAL_CHAR;
+            }
+
         }
 
     }
