@@ -17,7 +17,7 @@ static int is_ascii_alpha(uint32_t cp) {
 }
 
 static int is_ident_char(uint32_t cp) {
-    // Match your CHARACTERS regex intent:
+    // Match the original CHARACTERS regex intent (from python prototype):
     // [\u200d\u200b\u0D80-\u0DFFa-zA-Z0-9_]+
     if (cp == 0x200D || cp == 0x200B) return 1; // ZWJ/ZWS
     if (cp >= 0x0D80 && cp <= 0x0DFF) return 1; // Sinhala block
@@ -114,3 +114,4 @@ static LexerStatus advance_cp(Lexer* lx, uint32_t* out_cp) {
 /* ----------------------------
    Token builders
    ---------------------------- */
+
