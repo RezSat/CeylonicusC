@@ -20,4 +20,28 @@ Utf8Status utf8_next(const uint8_t* buf, size_t len, size_t* i, uint32_t* out_cp
 
     // Reject continuation byte as a start byte
     if (is_count(b0)) return UTF8_INVALID;
+
+    // Determine sequence length (with minimal validation ranges)
+
+    uint32_t cp = 0;
+    size_t need = 0;
+
+    if ((b0 & 0xE0u) == 0xC0u) {
+        // 110xxxxx => 2 bytes
+        need = 2;
+        cp = (uint32_t)(b0 & 0x1Fu);
+    } else if ((b0 & 0xF0u) == 0xE0u) {
+        // 1110xxxx => 3 bytes
+        need = 3;
+        cp = (uint32_t)(b0 & 0x0Fu);
+    } else if ((b0 & 0xF8u) == 0xF0u) {
+        // 11110xxx => 4 bytes
+        need = 4;
+        cp = (uint32_t)(b0 & 0x07u);
+    } else {
+        // 0xF5..0xFF re invalid in UTF-8
+        // also 0xF8.. are not used
+        return UTF8_INVALID;
+    }
+
 }
