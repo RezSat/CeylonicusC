@@ -115,3 +115,9 @@ static LexerStatus advance_cp(Lexer* lx, uint32_t* out_cp) {
    Token builders
    ---------------------------- */
 
+static void token_init(Token* t, TokenType type, const Position* start, const Position* end) {
+    memset(t, 0, sizeof(*t));
+    t->type = type;
+    t->start = *start;
+    t->end = *end;
+}
