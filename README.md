@@ -4,7 +4,7 @@ It's the first sinhala programming language, and was written in python for proto
 
 Key changes in this implementation is that, the language is no longer interpreted instead it is fully compiled (choosen because I want to learn a few bit about compilers and LLVM)
 
-So basically this is C Frontend -> LLVM Backend
+So basically this is C/C++ Frontend -> LLVM Backend
 
 Implement lexer + parser + AST in C/C++.
 
