@@ -52,3 +52,23 @@ static LexerStatus status_from_utf8(Utf8Status s) {
         default: return LEX_INVALID_UTF8;
     }
 }
+
+static LexerStatus peek_cp(Lexer* lx, uint32_t* out_cp) {
+    if (!lx || !out_cp) return LEX_INVALID_UTF8;
+
+    if (lx->has_current) {
+        *out_cp = lx->current_cp;
+        return LEX_OK;
+    }
+
+    size_t tmp_i = lx->i;
+    uint32_t cp = 0;
+    Utf8Status us = utf8_next(lx->src, lx->len, &tmp_i, &cp);
+    LexerStatus ls = status_from_utf8(us);
+    if (ls != LEX_OK) return ls;
+
+    lx->has_current = 1;
+    lx->current_cp = cp;
+    *out_cp = cp;
+    return LEX_OK;
+}
