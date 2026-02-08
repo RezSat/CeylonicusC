@@ -53,6 +53,12 @@ void lexer_init(Lexer* lx, const char* filename, const uint8_t* src, size_t len)
 // set/replace keyword matcher (optional)
 void lexer_set_keyword_fn(Lexer* lx, LexerIsKeywordFn fn);
 
+/*
+Get next token.
+    - on LEX_OK; out_tok is valid
+    - on LEX_OFF: out_tok will typically be TOK_EOF (implementation choice)
+    - on error: out_tok is unspecified; check lx->error_* fields for details.
+*/
 LexerStatus lexer_next_token(Lexer* lx, Token* out_tok);
 
 #ifdef __cplusplus
