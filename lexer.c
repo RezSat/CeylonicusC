@@ -464,6 +464,9 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
         if (cp == (uint32_t)'"' || cp == (uint32_t)'\'' ) {
             return lex_string(lx, out_tok);
         }
+        
+        // Operators / punctuation
+        switch (cp) {
 
     }
 }
