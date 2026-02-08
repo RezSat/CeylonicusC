@@ -30,3 +30,12 @@ static int is_ident_char(uint32_t cp) {
 static void set_pos(Position* dst, const Position* src) {
     *dst = *src;
 }
+
+static void set_error(Lexer* lx, const Position* start, const Position* end,
+                      uint32_t cp, char expected_ascii) {
+    if (!lx) return;
+    if (start) set_pos(&lx->error_pos_start, start);
+    if (end)   set_pos(&lx->error_pos_end, end);
+    lx->error_cp = cp;
+    lx->expected_ascii = expected_ascii;
+}
