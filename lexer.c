@@ -520,10 +520,14 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
                 token_init(out_tok, TOK_MINUS, &start, &end);
                 return LEX_OK;
             }
-            
+
             case '*': return make_simple_token(lx, out_tok, TOK_MUL);
             case '/': return make_simple_token(lx, out_tok, TOK_DIV);
             case '^': return make_simple_token(lx, out_tok, TOK_POWER);
+            case '(': return make_simple_token(lx, out_tok, TOK_LPAREN);
+            case ')': return make_simple_token(lx, out_tok, TOK_RPAREN);
+            case '[': return make_simple_token(lx, out_tok, TOK_LSQUARE);
+            case ']': return make_simple_token(lx, out_tok, TOK_RSQUARE);
 
   
         }
