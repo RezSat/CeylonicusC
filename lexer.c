@@ -460,5 +460,10 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             return lex_identifier_or_keyword(lx, out_tok);
         }
 
+        // String
+        if (cp == (uint32_t)'"' || cp == (uint32_t)'\'' ) {
+            return lex_string(lx, out_tok);
+        }
+
     }
 }
