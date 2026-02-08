@@ -11,3 +11,9 @@ So basically this is C/C++ Frontend -> LLVM Backend
 Implement lexer + parser + AST in C/C++.
 
 Generate LLVM IR using LLVM C++ APIs (or C API, but C++ is the “main” path).
+
+List of things to do (for my note):
+[] Write the main file
+[] Test the lexer
+[] parser
+[] -- I have to figure out what next haha....
