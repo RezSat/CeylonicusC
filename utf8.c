@@ -51,6 +51,23 @@ Utf8Status utf8_next(const uint8_t* buf, size_t len, size_t* i, uint32_t* out_cp
         uint8_t bx = buf[*i + k];
         if (!is_count(bx)) return UTF8_INVALID;
         cp = (cp << 6) | (uint32_t)(bx & 0x3Fu);
-
     }
+
+    // Overlong checks and unicode range checks
+    // These ensure the shortest valid enncoding is used.
+
+    if (need == 2 && cp < 0x80u) return UTF8_INVALID;
+    if (need == 3 && cp < 0x800u) return UTF8_INVALID;
+    if (need == 4 && cp < 0x10000u) return UTF8_INVALID;
+
+    // Reject surrogates (U+D800..U+DFFF)
+    if (cp >= 0xD800u && cp <= 0xDFFFu) return UTF8_INVALID;
+
+    // Reject out of range (> U+10FFFF)
+    if (cp > 0x10FFFFu) return UTF8_INVALID;
+
+    *out_cp = cp;
+    *i += need;
+    return UTF8_OK;
+
 }
