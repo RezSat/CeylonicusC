@@ -1,7 +1,11 @@
 #ifndef CEYLONICUS_LEXER_H
 #define CEYLONICUS_LEXER_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #include "token.h"
+#include "utf8.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,7 +47,13 @@ typedef struct Lexer {
 
 } Lexer;
 
+// Initialize a lexer over a UTF-8 byte buffer
+void lexer_init(Lexer* lx, const char* filename, const uint8_t* src, size_t len);
 
+// set/replace keyword matcher (optional)
+void lexer_set_keyword_fn(Lexer* lx, LexerIsKeywordFn fn);
+
+LexerStatus lexer_next_token(Lexer* lx, Token* out_tok);
 
 #ifdef __cplusplus
 }
