@@ -361,3 +361,25 @@ static LexerStatus lex_string(Lexer* lx, Token* out) {
 /* ----------------------------
    Public API
    ---------------------------- */
+
+void lexer_init(Lexer* lx, const char* filename, const uint8_t* src, size_t len) {
+    memset(lx, 0, sizeof(*lx));
+    lx->src = src;
+    lx->len = len;
+    lx->filename = filename;
+    lx->i = 0;
+
+    lx->pos.index = 0;
+    lx->pos.line = 0;
+    lx->pos.column = 0;
+
+    lx->has_current = 0;
+    lx->current_cp = 0;
+
+    lx->is_keyword = NULL;
+
+    lx->error_pos_start = lx->pos;
+    lx->error_pos_end = lx->pos;
+    lx->error_cp = 0;
+    lx->expected_ascii = 0;
+}
