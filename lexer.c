@@ -241,3 +241,119 @@ static LexerStatus lex_identifier_or_keyword(Lexer* lx, Token* out) {
     out->value.str = slice;
     return LEX_OK;
 }
+
+static LexerStatus lex_string(Lexer* lx, Token* out) {
+    // Supports both " and ' like python version.
+    Position start = lx->pos;
+
+    uint32_t quote = 0;
+    LexerStatus st = advance_cp(lx, &quote); // consume opening quote
+    if (st != LEX_OK) return st;
+
+    // Build unescaped string in a growable buffer
+    size_t cap = 32;
+    size_t len = 0;
+    char* buf = (char*)malloc(cap);
+    if (!buf) {
+        Position end = lx->pos;
+        set_error(lx, &start, &end, 0, 0);
+        return LEX_ILLEGAL_CHAR;
+    }
+
+    int escaping = 0;
+
+    for (;;) {
+        uint32_t cp = 0;
+        st = peek_cp(lx, &cp);
+
+        if (st == LEX_EOF) {
+            Position end = lx->pos;
+            set_error(lx, &start, &end, 0, 0);
+            free(buf);
+            return LEX_UNTERMINATED_STRING;
+        }
+        if (st != LEX_OK) {
+            free(buf);
+            return st;
+        }
+
+        if (!escaping && cp == quote) {
+            // consume closing quote
+            uint32_t consumed = 0;
+            st = advance_cp(lx, &consumed);
+            if (st != LEX_OK) { free(buf); return st; }
+            break;
+        }
+
+        // consume cp
+        uint32_t consumed = 0;
+        st = advance_cp(lx, &consumed);
+        if (st != LEX_OK) { free(buf); return st; }
+
+        if (!escaping && consumed == (uint32_t)'\\') {
+            escaping = 1;
+            continue;
+        }
+
+        uint32_t out_ch = consumed;
+        if (escaping) {
+            if (consumed == (uint32_t)'n') out_ch = (uint32_t)'\n';
+            else if (consumed == (uint32_t)'t') out_ch = (uint32_t)'\t';
+            // else: keep as-is
+            escaping = 0;
+        }
+
+        // Store as UTF-8 bytes. For now: only special escapes become ASCII,
+        // and otherwise we keep original codepoints by re-encoding minimal UTF-8.
+        // Since consumed is a Unicode scalar value (from utf8_next), we can encode it.
+
+        // Ensure capacity for up to 4 bytes
+        if (len + 4 >= cap) {
+            cap *= 2;
+            char* nb = (char*)realloc(buf, cap);
+            if (!nb) {
+                Position end = lx->pos;
+                set_error(lx, &start, &end, 0, 0);
+                free(buf);
+                return LEX_ILLEGAL_CHAR;
+            }
+            buf = nb;
+        }
+
+        if (out_ch <= 0x7F) {
+            buf[len++] = (char)out_ch;
+        } else if (out_ch <= 0x7FF) {
+            buf[len++] = (char)(0xC0 | ((out_ch >> 6) & 0x1F));
+            buf[len++] = (char)(0x80 | (out_ch & 0x3F));
+        } else if (out_ch <= 0xFFFF) {
+            buf[len++] = (char)(0xE0 | ((out_ch >> 12) & 0x0F));
+            buf[len++] = (char)(0x80 | ((out_ch >> 6) & 0x3F));
+            buf[len++] = (char)(0x80 | (out_ch & 0x3F));
+        } else {
+            buf[len++] = (char)(0xF0 | ((out_ch >> 18) & 0x07));
+            buf[len++] = (char)(0x80 | ((out_ch >> 12) & 0x3F));
+            buf[len++] = (char)(0x80 | ((out_ch >> 6) & 0x3F));
+            buf[len++] = (char)(0x80 | (out_ch & 0x3F));
+        }
+    }
+
+    // Null-terminate for convenience (not counted in slice.len)
+    if (len + 1 >= cap) {
+        char* nb = (char*)realloc(buf, len + 1);
+        if (!nb) {
+            Position end = lx->pos;
+            set_error(lx, &start, &end, 0, 0);
+            free(buf);
+            return LEX_ILLEGAL_CHAR;
+        }
+        buf = nb;
+    }
+    buf[len] = '\0';
+
+    Position end = lx->pos;
+    token_init(out, TOK_STRING, &start, &end);
+    out->value.str.ptr = buf; // heap-owned
+    out->value.str.len = len;
+
+    return LEX_OK;
+}
