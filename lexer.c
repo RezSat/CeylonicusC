@@ -39,3 +39,7 @@ static void set_error(Lexer* lx, const Position* start, const Position* end,
     lx->error_cp = cp;
     lx->expected_ascii = expected_ascii;
 }
+
+/* ----------------------------
+   UTF-8 peek/advance
+   ---------------------------- */
