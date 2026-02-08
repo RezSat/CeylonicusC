@@ -110,3 +110,7 @@ static LexerStatus advance_cp(Lexer* lx, uint32_t* out_cp) {
     *out_cp = cp;
     return LEX_OK;
 }
+
+/* ----------------------------
+   Token builders
+   ---------------------------- */
