@@ -2,6 +2,7 @@
 #define CEYLONICUS_TOKEN_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 /*
     In the prototype (Ceylonicus) I have added it so that python code can be run,
@@ -45,11 +46,12 @@ typedef struct {
     size_t len;
 } StrSlice;
 
-union TokenValue {
+typedef union TokenValue {
     int64_t i; // integer (short hand for TOK_INT)
     double f; // float (short hand for TOK_FLOAT)
     StrSlice str; // string (for TOK_KEYWORD, TOK_ID, TOK_STRING)
-}
+} TokenValue;
+
 typedef struct {
     size_t index; //byte index
     size_t line;
