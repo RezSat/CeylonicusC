@@ -383,3 +383,7 @@ void lexer_init(Lexer* lx, const char* filename, const uint8_t* src, size_t len)
     lx->error_cp = 0;
     lx->expected_ascii = 0;
 }
+
+void lexer_set_keyword_fn(Lexer* lx, LexerIsKeywordFn fn) {
+    if (lx) lx->is_keyword = fn;
+}
