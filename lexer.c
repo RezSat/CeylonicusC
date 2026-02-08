@@ -529,6 +529,30 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             case '[': return make_simple_token(lx, out_tok, TOK_LSQUARE);
             case ']': return make_simple_token(lx, out_tok, TOK_RSQUARE);
             case ',': return make_simple_token(lx, out_tok, TOK_COMMA);
+            
+            case '!': {
+                // must be !=
+                Position start = lx->pos;
+                uint32_t c = 0;
+                st = advance_cp(lx, &c);
+                if (st != LEX_OK) return st;
+
+                uint32_t next = 0;
+                st = peek_cp(lx, &next);
+                if (st == LEX_OK && next == (uint32_t)'=') {
+                    uint32_t tmp = 0;
+                    st = advance_cp(lx, &tmp);
+                    if (st != LEX_OK) return st;
+                    Position end = lx->pos;
+                    token_init(out_tok, TOK_NOTEQ, &start, &end);
+                    return LEX_OK;
+                }
+
+                // error: expected '=' after '!'
+                Position err_end = lx->pos;
+                set_error(lx, &start, &err_end, (uint32_t)'!', '=');
+                return LEX_EXPECTED_CHAR;
+            }
 
   
         }
