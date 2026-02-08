@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
     In the prototype (Ceylonicus) I have added it so that python code can be run,
     but that is only added for fun because it was entirely written in python anyway,
@@ -65,4 +69,8 @@ typedef struct {
     TokenValue value;
 } Token;
 
-#endif //CEYLONICUS_TOKEN_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif // CEYLONICUS_TOKEN_H
