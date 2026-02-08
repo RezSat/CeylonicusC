@@ -357,3 +357,7 @@ static LexerStatus lex_string(Lexer* lx, Token* out) {
 
     return LEX_OK;
 }
+
+/* ----------------------------
+   Public API
+   ---------------------------- */
