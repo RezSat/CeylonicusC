@@ -387,3 +387,18 @@ void lexer_init(Lexer* lx, const char* filename, const uint8_t* src, size_t len)
 void lexer_set_keyword_fn(Lexer* lx, LexerIsKeywordFn fn) {
     if (lx) lx->is_keyword = fn;
 }
+
+LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
+    if (!lx || !out_tok) return LEX_ILLEGAL_CHAR;
+
+    // Clear previous error info
+    lx->error_pos_start = lx->pos;
+    lx->error_pos_end = lx->pos;
+    lx->error_cp = 0;
+    lx->expected_ascii = 0;
+
+    for (;;) {
+        uint32_t cp = 0;
+        LexerStatus st = peek_cp(lx, &cp);
+    }
+}
