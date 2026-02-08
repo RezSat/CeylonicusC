@@ -211,3 +211,33 @@ static LexerStatus lex_number(Lexer* lx, Token* out) {
     free(tmp);
     return LEX_OK;
 }
+
+static LexerStatus lex_identifier_or_keyword(Lexer* lx, Token* out) {
+    Position start = lx->pos;
+    size_t start_byte = lx->i;
+
+    for (;;) {
+        uint32_t cp = 0;
+        LexerStatus st = peek_cp(lx, &cp);
+        if (st != LEX_OK) break;
+        if (!is_ident_char(cp)) break;
+
+        uint32_t consumed = 0;
+        st = advance_cp(lx, &consumed);
+        if (st != LEX_OK) return st;
+    }
+
+    size_t end_byte = lx->i;
+    Position end = lx->pos;
+
+    StrSlice slice;
+    slice.ptr = (const char*)lx->src + start_byte;
+    slice.len = end_byte - start_byte;
+
+    TokenType type = TOK_ID;
+    if (lx->is_keyword && lx->is_keyword(slice)) type = TOK_KEYWORD;
+
+    token_init(out, type, &start, &end);
+    out->value.str = slice;
+    return LEX_OK;
+}
