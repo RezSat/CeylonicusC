@@ -43,3 +43,12 @@ static void set_error(Lexer* lx, const Position* start, const Position* end,
 /* ----------------------------
    UTF-8 peek/advance
    ---------------------------- */
+
+static LexerStatus status_from_utf8(Utf8Status s) {
+    switch (s) {
+        case UTF8_OK: return LEX_OK;
+        case UTF8_EOF: return LEX_EOF;
+        case UTF8_INVALID: return LEX_INVALID_UTF8;
+        default: return LEX_INVALID_UTF8;
+    }
+}
