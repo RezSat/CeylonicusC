@@ -411,11 +411,18 @@ LexerStatus lexer_next_token(Lexer* lx, Token* out_tok) {
             set_error(lx, &lx->pos, &lx->pos, 0, 0);
             return st;
         }
-        
+
         // Skip spaces and tabs
         if (cp == (uint32_t)' ' || cp == (uint32_t)'\t' || cp == (uint32_t)'\r') {
             uint32_t consumed = 0;
             st = advance_cp(lx, &consumed);
+            if (st != LEX_OK) return st;
+            continue;
+        }
+
+        // Comment
+        if (cp == (uint32_t)'#') {
+            st = skip_comment(lx);
             if (st != LEX_OK) return st;
             continue;
         }
