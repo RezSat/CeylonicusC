@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #include <string.h>
 #include "keywords.h"
 
