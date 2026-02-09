@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #ifndef CEYLONICUS_TOKEN_H
 #define CEYLONICUS_TOKEN_H
 
