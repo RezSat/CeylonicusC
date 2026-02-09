@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "include/lexer.h"
-#include "include/keywords.h"
+#include "lexer.h"
+#include "keywords.h"
 
 // Helper to turn enums into readable text
 const char* token_type_to_str(TokenType type) {

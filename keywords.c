@@ -4,7 +4,7 @@
 
 
 #include <string.h>
-#include "include/keywords.h"
+#include "keywords.h"
 
 // Simply got from the github.com/RezSat/Ceylonicus/tokens.py 
 static const char* CEY_KEYWORDS[] = {

@@ -2,7 +2,7 @@
     Author: RezSat <yehanwasura@duck.com>
 */
 
-#include "include/lexer.h"
+#include "lexer.h"
 
 #include <stdlib.h>
 #include <string.h>

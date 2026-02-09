@@ -3,7 +3,7 @@
 */
 
 
-#include "include/utf8.h"
+#include "utf8.h"
 
 static int is_cont(uint8_t b) {
     return (b & 0xC0u) == 0x80u; // 10xxxxxx
