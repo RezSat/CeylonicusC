@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #ifndef CEYLONICUS_LEXER_H
 #define CEYLONICUS_LEXER_H
 
