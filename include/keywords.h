@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #ifndef CEYLONICUS_KEYWORDS_H
 #define CEYLONICUS_KEYWRODS_H
 
