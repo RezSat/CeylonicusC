@@ -11,6 +11,6 @@
 int main() {
     FILE* fptr;
     fptr = fopen("write.cyl", "r");
-    printf("%s", fptr);
+    
     return 0;
 }
