@@ -13,8 +13,8 @@ Implement lexer + parser + AST in C/C++.
 Generate LLVM IR using LLVM C++ APIs (or C API, but C++ is the “main” path).
 
 List of things to do (for my note):
-- [ ] Write the main file
-- [ ] Test the lexer
+- [X] Write the main file
+- [X] Test the lexer - Works as expected just a few simple fixes on things other than that, it works.
 - [ ] parser
 - [ ] -- I have to figure out what next haha....
 
