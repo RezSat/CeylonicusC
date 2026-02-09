@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #include "utf8.h"
 
 static int is_cont(uint8_t b) {
