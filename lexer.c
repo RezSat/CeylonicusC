@@ -1,3 +1,7 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
 #include "lexer.h"
 
 #include <stdlib.h>
