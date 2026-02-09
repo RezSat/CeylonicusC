@@ -1,3 +1,8 @@
+/*
+    Author: RezSat <yehanwasura@duck.com>
+*/
+
+
 #ifndef CEYLONICUS_UTF8_H
 #define CEYLONICUS_UTF8_H
 
