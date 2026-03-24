@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "lexer.h"
+#include "keywords.h"
+#include "token.h"
+
 static void print_usage(const char *progname) {
     fprintf(stderr, "Usage: %s <file.cyl>\n", progname);
 }
@@ -67,7 +71,22 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    printf("loaded %zu bytes from %s\n", size, filename);
+    Lexer lx;
+    lexer_init(&lx, filename, buffer, size);
+    lexer_set_keyword_fn(&lx, lexer_default_is_keyword);
+
+    Token tok;
+    LexerStatus status;
+    while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
+    }
+
     free(buffer);
-    return 0;
+
+    if (status == LEX_EOF) {
+        printf("lexing completed\n");
+        return 0;
+    }
+
+    fprintf(stderr, "lexer failed with status %d\n", status);
+    return 2;
 }
