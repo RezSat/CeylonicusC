@@ -17,13 +17,34 @@ static void print_usage(const char *progname) {
 
 static const char *token_type_to_str(TokenType type) {
     switch (type) {
-        case TOK_INT:     return "INT";
-        case TOK_FLOAT:   return "FLOAT";
-        case TOK_ID:      return "IDENTIFIER";
-        case TOK_KEYWORD: return "KEYWORD";
-        case TOK_STRING:  return "STRING";
-        case TOK_EOF:     return "EOF";
-        default:          return "UNKNOWN";
+        case TOK_INT:         return "INT";
+        case TOK_FLOAT:       return "FLOAT";
+        case TOK_ID:          return "IDENTIFIER";
+        case TOK_KEYWORD:     return "KEYWORD";
+        case TOK_STRING:      return "STRING";
+        case TOK_PLUS:        return "PLUS";
+        case TOK_MINUS:       return "MINUS";
+        case TOK_MUL:         return "MUL";
+        case TOK_DIV:         return "DIV";
+        case TOK_LPAREN:      return "LPAREN";
+        case TOK_RPAREN:      return "RPAREN";
+        case TOK_LSQUARE:     return "LSQUARE";
+        case TOK_RSQUARE:     return "RSQUARE";
+        case TOK_COMMA:       return "COMMA";
+        case TOK_EQ:          return "EQ";
+        case TOK_EQEQ:        return "EQEQ";
+        case TOK_NOTEQ:       return "NOTEQ";
+        case TOK_LESSTHAN:    return "LESSTHAN";
+        case TOK_GREATERTHAN: return "GREATERTHAN";
+        case TOK_LTEQ:        return "LTEQ";
+        case TOK_GTEQ:        return "GTEQ";
+        case TOK_POWER:       return "POWER";
+        case TOK_ARROW:       return "ARROW";
+        case TOK_PLUSEQ:      return "PLUSEQ";
+        case TOK_MINUSEQ:     return "MINUSEQ";
+        case TOK_NEWLINE:     return "NEWLINE";
+        case TOK_EOF:         return "EOF";
+        default:              return "UNKNOWN";
     }
 }
 
@@ -49,7 +70,7 @@ static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *
 
     rewind(f);
 
-    uint8_t *buffer = (uint8_t *)malloc((size_t)file_size);
+    uint8_t *buffer = (uint8_t *)malloc((size_t)file_size + 1);
     if (!buffer) {
         fprintf(stderr, "error: out of memory while reading: %s\n", filename);
         fclose(f);
@@ -65,20 +86,25 @@ static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *
         return 0;
     }
 
+    buffer[file_size] = '\0'; /* optional safety terminator */
+
     *out_buffer = buffer;
     *out_size = (size_t)file_size;
     return 1;
 }
 
 static void print_lexer_error(const Lexer *lx, LexerStatus status) {
-    fprintf(stderr, "lexer error: ");
+    fprintf(stderr, "%s:%zu:%zu: lexer error: ",
+            lx->filename ? lx->filename : "<input>",
+            lx->error_pos_start.line + 1,
+            lx->error_pos_start.column + 1);
 
     switch (status) {
         case LEX_INVALID_UTF8:
             fprintf(stderr, "invalid UTF-8 sequence\n");
             break;
         case LEX_ILLEGAL_CHAR:
-            fprintf(stderr, "illegal character\n");
+            fprintf(stderr, "illegal character (U+%04X)\n", lx->error_cp);
             break;
         case LEX_UNTERMINATED_STRING:
             fprintf(stderr, "unterminated string literal\n");
@@ -101,12 +127,35 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size, i
     LexerStatus status;
 
     while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
-        if (dump_tokens) {
-            printf("%s\n", token_type_to_str(tok.type));
+        if (!dump_tokens) {
+            continue;
+        }
+
+        printf("[%zu:%zu] %-12s",
+               tok.start.line + 1,
+               tok.start.column + 1,
+               token_type_to_str(tok.type));
+
+        if (tok.type == TOK_INT) {
+            printf(" | %lld", (long long)tok.value.i);
+        } else if (tok.type == TOK_FLOAT) {
+            printf(" | %f", tok.value.f);
+        } else if (tok.type == TOK_ID || tok.type == TOK_KEYWORD || tok.type == TOK_STRING) {
+            printf(" | '%.*s'", (int)tok.value.str.len, tok.value.str.ptr);
+        }
+
+        printf("\n");
+
+        /* if your lexer allocates string token memory, free it here */
+        if (tok.type == TOK_STRING && tok.value.str.ptr) {
+            free((void *)tok.value.str.ptr);
         }
     }
 
     if (status == LEX_EOF) {
+        if (dump_tokens) {
+            printf("Lexing completed successfully.\n");
+        }
         return 0;
     }
 
