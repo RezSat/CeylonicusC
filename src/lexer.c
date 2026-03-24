@@ -186,6 +186,8 @@ static LexerStatus lex_number(Lexer* lx, Token* out) {
     size_t n = end_byte - start_byte;
 
     // Reject lone "." (otherwise strtod would accept it weirdly / fail)
+    // NOTE: Treats . as a number start only if the next char is a digit, otherwise illegal
+    // revist this rule if grows member access, ranges or method syntax
     if (n == 1 && lx->src[start_byte] == (uint8_t)'.') {
         Position end = lx->pos;
         set_error(lx, &start, &end, (uint32_t)'.', 0);

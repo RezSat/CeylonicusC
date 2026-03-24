@@ -4,7 +4,7 @@
 
 
 #ifndef CEYLONICUS_KEYWORDS_H
-#define CEYLONICUS_KEYWRODS_H
+#define CEYLONICUS_KEYWORDS_H
 
 #include "token.h"
 
