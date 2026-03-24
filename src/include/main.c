@@ -57,6 +57,28 @@ static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *
     return 1;
 }
 
+static void print_lexer_error(const Lexer *lx, LexerStatus status) {
+    fprintf(stderr, "lexer error: ");
+
+    switch (status) {
+        case LEX_INVALID_UTF8:
+            fprintf(stderr, "invalid UTF-8 sequence\n");
+            break;
+        case LEX_ILLEGAL_CHAR:
+            fprintf(stderr, "illegal character\n");
+            break;
+        case LEX_UNTERMINATED_STRING:
+            fprintf(stderr, "unterminated string literal\n");
+            break;
+        case LEX_EXPECTED_CHAR:
+            fprintf(stderr, "expected '%c'\n", lx->expected_ascii);
+            break;
+        default:
+            fprintf(stderr, "unknown lexer error (%d)\n", status);
+            break;
+    }
+}
+
 static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
     Lexer lx;
     lexer_init(&lx, filename, buffer, size);
@@ -72,7 +94,7 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
         return 0;
     }
 
-    fprintf(stderr, "lexer failed with status %d\n", status);
+    print_lexer_error(&lx, status);
     return 2;
 }
 
