@@ -57,6 +57,25 @@ static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *
     return 1;
 }
 
+static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
+    Lexer lx;
+    lexer_init(&lx, filename, buffer, size);
+    lexer_set_keyword_fn(&lx, lexer_default_is_keyword);
+
+    Token tok;
+    LexerStatus status;
+
+    while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
+    }
+
+    if (status == LEX_EOF) {
+        return 0;
+    }
+
+    fprintf(stderr, "lexer failed with status %d\n", status);
+    return 2;
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         print_usage(argv[0]);
@@ -71,22 +90,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    Lexer lx;
-    lexer_init(&lx, filename, buffer, size);
-    lexer_set_keyword_fn(&lx, lexer_default_is_keyword);
-
-    Token tok;
-    LexerStatus status;
-    while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
-    }
+    int result = run_lexer(filename, buffer, size);
 
     free(buffer);
-
-    if (status == LEX_EOF) {
-        printf("lexing completed\n");
-        return 0;
-    }
-
-    fprintf(stderr, "lexer failed with status %d\n", status);
-    return 2;
+    return result;
 }
