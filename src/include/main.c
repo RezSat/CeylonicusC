@@ -15,6 +15,18 @@ static void print_usage(const char *progname) {
     fprintf(stderr, "Usage: %s [--tokens] <file.cyl>\n", progname);
 }
 
+static const char *token_type_to_str(TokenType type) {
+    switch (type) {
+        case TOK_INT:     return "INT";
+        case TOK_FLOAT:   return "FLOAT";
+        case TOK_ID:      return "IDENTIFIER";
+        case TOK_KEYWORD: return "KEYWORD";
+        case TOK_STRING:  return "STRING";
+        case TOK_EOF:     return "EOF";
+        default:          return "UNKNOWN";
+    }
+}
+
 static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *out_size) {
     FILE *f = fopen(filename, "rb");
     if (!f) {
@@ -90,7 +102,7 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size, i
 
     while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
         if (dump_tokens) {
-            printf("token type: %d\n", tok.type);
+            printf("%s\n", token_type_to_str(tok.type));
         }
     }
 
