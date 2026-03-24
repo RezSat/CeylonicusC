@@ -146,7 +146,7 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size, i
 
         printf("\n");
 
-        /* if your lexer allocates string token memory, free it here */
+        /* freeing lexer allocated string token memory */
         if (tok.type == TOK_STRING && tok.value.str.ptr) {
             free((void *)tok.value.str.ptr);
         }
