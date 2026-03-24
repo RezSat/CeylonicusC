@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
 #include "lexer.h"
@@ -11,7 +12,7 @@
 #include "token.h"
 
 static void print_usage(const char *progname) {
-    fprintf(stderr, "Usage: %s <file.cyl>\n", progname);
+    fprintf(stderr, "Usage: %s [--tokens] <file.cyl>\n", progname);
 }
 
 static int read_entire_file(const char *filename, uint8_t **out_buffer, size_t *out_size) {
@@ -79,7 +80,7 @@ static void print_lexer_error(const Lexer *lx, LexerStatus status) {
     }
 }
 
-static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
+static int run_lexer(const char *filename, const uint8_t *buffer, size_t size, int dump_tokens) {
     Lexer lx;
     lexer_init(&lx, filename, buffer, size);
     lexer_set_keyword_fn(&lx, lexer_default_is_keyword);
@@ -88,6 +89,9 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
     LexerStatus status;
 
     while ((status = lexer_next_token(&lx, &tok)) == LEX_OK) {
+        if (dump_tokens) {
+            printf("token type: %d\n", tok.type);
+        }
     }
 
     if (status == LEX_EOF) {
@@ -99,12 +103,19 @@ static int run_lexer(const char *filename, const uint8_t *buffer, size_t size) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
+    int dump_tokens = 0;
+    const char *filename = NULL;
+
+    if (argc == 2) {
+        filename = argv[1];
+    } else if (argc == 3 && strcmp(argv[1], "--tokens") == 0) {
+        dump_tokens = 1;
+        filename = argv[2];
+    } else {
         print_usage(argv[0]);
         return 1;
     }
 
-    const char *filename = argv[1];
     uint8_t *buffer = NULL;
     size_t size = 0;
 
@@ -112,7 +123,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    int result = run_lexer(filename, buffer, size);
+    int result = run_lexer(filename, buffer, size, dump_tokens);
 
     free(buffer);
     return result;
